@@ -16,6 +16,7 @@ from datetime import datetime
 # KONFİGÜRASYON - KENDİ DOSYA YOLUNUZLA DEĞİŞTİRİN
 # ═══════════════════════════════════════════════
 EXCEL_PATH = "veri.xlsx"         # Excel dosyasının adı (repo kökünde)
+TEMPLATE_HTML = "template.html"    # Şablon HTML
 OUTPUT_HTML = "parti_takip.html"  # Üretilecek HTML
 OUTPUT_JSON = "parti_veri.json"   # Polling için JSON verisi
 
@@ -324,8 +325,15 @@ def main():
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
 
-    with open(OUTPUT_HTML, "r", encoding="utf-8") as f:
-        html_template = f.read()
+    if os.path.exists(TEMPLATE_HTML):
+        with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:
+            html_template = f.read()
+    elif os.path.exists(OUTPUT_HTML):
+        with open(OUTPUT_HTML, "r", encoding="utf-8") as f:
+            html_template = f.read()
+    else:
+        print("HATA: Şablon HTML dosyası bulunamadı")
+        sys.exit(1)
 
     html = build_html(asama_data, asama_order, bir_sonraki_sirasi, ts, gk, html_template)
 
