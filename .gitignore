@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+*.xlsx
+!veri.xlsx
+parti_takip.html
+parti_veri.json
+extract_html.py
