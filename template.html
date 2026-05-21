@@ -424,9 +424,23 @@ function safeSet(key) {
     return new Set();
 }
 
-const DATA=__DATA_JSON__;
-const ASAMA_ORDER=__ORDER_JSON__;
-const BSA_ORDER=__BSA_ORDER_JSON__;
+let DATA={},ASAMA_ORDER=[],BSA_ORDER=[];
+let dataLoaded = false;
+
+async function loadData() {
+    try {
+        const r = await fetch('parti_veri.json?_=' + Date.now(), { cache: 'no-cache' });
+        const json = await r.json();
+        DATA = json.DATA || {};
+        ASAMA_ORDER = json.ASAMA_ORDER || [];
+        BSA_ORDER = json.BSA_ORDER || [];
+        dataLoaded = true;
+        init();
+    } catch(e) {
+        setTimeout(loadData, 1000);
+    }
+}
+loadData();
 const FIRE_REASONS=['Leke','Yırtık','Renk Farkı','Dokuma Hatası','Boya Hatası','Kesim Firesi','Metraj Eksikliği','Numune Firesi','Test Firesi','Kenar Firesi','Dikiş/Birleşim Hatası','Diğer'];
 const DURUM_KAT=['Acil','Öncelikli','Beklemede','Sorunlu','Tamamlandı','Müşteri Bekleniyor','Üretim Hatası'];
 const ALARM_PRIORITIES=['Kritik','Yüksek','Orta','Düşük'];
@@ -1023,7 +1037,6 @@ function downloadWorkbook(fn,sheets){let x='<?xml version="1.0" encoding="UTF-8"
 function exportFireWorkbook(){const rows=[];Object.keys(fireRecords).forEach(id=>{getFireList(id).forEach((f,i)=>{rows.push({'Parti':f.parti,'Aşama':f.asama,'#':i+1,'Sebep':f.fire_sebebi,'Fire Kg':num(f.fire_kg),'Fire Mt':num(f.fire_mt),'Açıklama':f.fire_aciklama||'','Tarih':f.saved_at})})});if(!rows.length){alert('Fire yok');return}downloadWorkbook('fire_'+new Date().toLocaleDateString('tr-TR').replace(/\\\\\\\\./g,'_')+'.xls',[{name:'Fire',rows}])}
 function exportAllToExcel(){const rows=getAllCards().map(k=>{const fl=getFireList(k.id);const al=getAlarmsList(k.id);const sel=selectedRecords[k.id];return{'Aşama':k._asama,'Bir Sonraki':k.bir_sonraki||'','Parti':k.parti,'Firma':k.line1||'','Kumaş':k.ham_adi||'','Reçete':k.recete_adi||'','Kilo':num(k.kilo),'Bekleme (gün)':num(k.bekleme_gun),'Durum':sel?sel.durum:'','Not':sel?sel.not:(noteRecords[k.id]?noteRecords[k.id].note:''),'Fire (kg)':fl.reduce((a,b)=>a+num(b.fire_kg),0),'Alarm':al.filter(a=>a.active!==false).map(a=>a.title).join(', '),'Seviye':k.seviye==='kritik'?'KRİTİK':k.seviye==='uyari'?'UYARI':'NORMAL','Seçili':sel?'Evet':'Hayır'}});downloadWorkbook('parti_takip_'+new Date().toLocaleDateString('tr-TR').replace(/\\\\\\\\./g,'')+'.xls',[{name:'Tümü',rows}])}
 
-init();
 </script>
 </body>
 </html>

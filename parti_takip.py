@@ -16,8 +16,6 @@ from datetime import datetime
 # KONFİGÜRASYON - KENDİ DOSYA YOLUNUZLA DEĞİŞTİRİN
 # ═══════════════════════════════════════════════
 EXCEL_PATH = "veri.xlsx"         # Excel dosyasının adı (repo kökünde)
-TEMPLATE_HTML = "template.html"    # Şablon HTML
-OUTPUT_HTML = "parti_takip.html"  # Üretilecek HTML
 OUTPUT_JSON = "parti_veri.json"   # Polling için JSON verisi
 
 BEKLEME_UYARI_GUN = 7
@@ -281,21 +279,6 @@ def process_excel(input_path):
 
     return asama_data, asama_order, bir_sonraki_sirasi, ts, gk
 
-def build_html(asama_data, asama_order, bir_sonraki_sirasi, ts, gk, html_template):
-    data_json=json.dumps(asama_data,ensure_ascii=False).replace("</", "<\\/")
-    order_json=json.dumps(asama_order,ensure_ascii=False).replace("</", "<\\/")
-    bsa_order_json=json.dumps(bir_sonraki_sirasi,ensure_ascii=False).replace("</", "<\\/")
-
-    len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
-
-    html = html_template.replace("__DATA_JSON__", data_json)
-    html = html.replace("__ORDER_JSON__", order_json)
-    html = html.replace("__BSA_ORDER_JSON__", bsa_order_json)
-    html = html.replace("__TS__", ts)
-    html = html.replace("__LEN_OZET__", str(len_ozet))
-    html = html.replace("__GK__", f"{gk:,.0f}")
-    return html
-
 def build_json_file(asama_data, asama_order, bir_sonraki_sirasi):
     return json.dumps({
         "DATA": asama_data,
@@ -325,29 +308,11 @@ def main():
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
 
-    if os.path.exists(TEMPLATE_HTML):
-        with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:
-            html_template = f.read()
-    elif os.path.exists(OUTPUT_HTML):
-        with open(OUTPUT_HTML, "r", encoding="utf-8") as f:
-            html_template = f.read()
-    else:
-        print("HATA: Şablon HTML dosyası bulunamadı")
-        sys.exit(1)
-
-    html = build_html(asama_data, asama_order, bir_sonraki_sirasi, ts, gk, html_template)
-
-    with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
-        f.write(html)
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
-
     json_content = build_json_file(asama_data, asama_order, bir_sonraki_sirasi)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         f.write(json_content)
 
     len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
-    print(f"✅ HTML oluşturuldu: {OUTPUT_HTML} + index.html")
     print(f"✅ JSON oluşturuldu: {OUTPUT_JSON}")
     print(f"📌 {len_ozet} parti • {len(asama_order)} aşama • {gk:,.0f} kg")
 
