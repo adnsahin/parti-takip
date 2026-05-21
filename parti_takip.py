@@ -9,6 +9,7 @@ import re
 import json
 import sys
 import os
+import glob
 from datetime import datetime
 
 # ═══════════════════════════════════════════════
@@ -309,8 +310,17 @@ def main():
         excel_path = EXCEL_PATH
 
     if not os.path.exists(excel_path):
-        print(f"HATA: Excel dosyası bulunamadı: {excel_path}")
-        sys.exit(1)
+        # Alternatif uzantıları dene
+        xlsx_files = glob.glob("veri.Xlsx") + glob.glob("veri.xlsx") + glob.glob("VERI.XLSX") + glob.glob("veri.*")
+        if xlsx_files:
+            excel_path = xlsx_files[0]
+            print(f"Excel bulundu: {excel_path}")
+        else:
+            print(f"HATA: Excel dosyası bulunamadı: {excel_path}")
+            print("Mevcut .xlsx dosyaları:")
+            for f in glob.glob("*"):
+                print(f"  {f}")
+            sys.exit(1)
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
 
