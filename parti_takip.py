@@ -307,6 +307,7 @@ def main():
             sys.exit(1)
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
+    len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
 
     data_json_str = json.dumps(asama_data, ensure_ascii=False).replace("</", "<\\/")
     order_json_str = json.dumps(asama_order, ensure_ascii=False).replace("</", "<\\/")
