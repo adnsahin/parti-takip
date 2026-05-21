@@ -425,21 +425,7 @@ function safeSet(key) {
 }
 
 let DATA={},ASAMA_ORDER=[],BSA_ORDER=[];
-
-async function loadData() {
-    try {
-        const r = await fetch('parti_veri.json');
-        const json = await r.json();
-        DATA = json.DATA || {};
-        ASAMA_ORDER = json.ASAMA_ORDER || [];
-        BSA_ORDER = json.BSA_ORDER || [];
-        init();
-    } catch(e) {
-        document.getElementById('cardsContainer').innerHTML = '<div class="no-results" style="padding:50px;text-align:center">Veri yükleniyor...<br><small>' + e.message + '</small></div>';
-        setTimeout(loadData, 2000);
-    }
-}
-loadData();
+async function loadData(){try{const r=await fetch('parti_veri.json');const j=await r.json();DATA=j.DATA||{};ASAMA_ORDER=j.ASAMA_ORDER||[];BSA_ORDER=j.BSA_ORDER||[];init()}catch(e){setTimeout(loadData,2000)}}loadData();
 const FIRE_REASONS=['Leke','Yırtık','Renk Farkı','Dokuma Hatası','Boya Hatası','Kesim Firesi','Metraj Eksikliği','Numune Firesi','Test Firesi','Kenar Firesi','Dikiş/Birleşim Hatası','Diğer'];
 const DURUM_KAT=['Acil','Öncelikli','Beklemede','Sorunlu','Tamamlandı','Müşteri Bekleniyor','Üretim Hatası'];
 const ALARM_PRIORITIES=['Kritik','Yüksek','Orta','Düşük'];
