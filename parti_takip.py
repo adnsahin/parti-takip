@@ -308,12 +308,29 @@ def main():
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
 
+    data_json_str = json.dumps(asama_data, ensure_ascii=False).replace("</", "<\\/")
+    order_json_str = json.dumps(asama_order, ensure_ascii=False).replace("</", "<\\/")
+    bsa_order_str = json.dumps(bir_sonraki_sirasi, ensure_ascii=False).replace("</", "<\\/")
+
+    with open("template.html", "r", encoding="utf-8") as f:
+        html = f.read()
+
+    html = html.replace("__DATA_JSON__", data_json_str)
+    html = html.replace("__ORDER_JSON__", order_json_str)
+    html = html.replace("__BSA_ORDER__", bsa_order_str)
+    html = html.replace("__TS__", ts)
+    html = html.replace("__LEN_OZET__", str(len_ozet))
+    html = html.replace("__GK__", f"{gk:,.0f}")
+
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
     json_content = build_json_file(asama_data, asama_order, bir_sonraki_sirasi)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         f.write(json_content)
 
     len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
-    print(f"✅ JSON oluşturuldu: {OUTPUT_JSON}")
+    print(f"✅ index.html + JSON oluşturuldu")
     print(f"📌 {len_ozet} parti • {len(asama_order)} aşama • {gk:,.0f} kg")
 
 if __name__ == "__main__":
