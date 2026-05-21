@@ -331,13 +331,15 @@ def main():
 
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
     json_content = build_json_file(asama_data, asama_order, bir_sonraki_sirasi)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         f.write(json_content)
 
     len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
-    print(f"✅ HTML oluşturuldu: {OUTPUT_HTML}")
+    print(f"✅ HTML oluşturuldu: {OUTPUT_HTML} + index.html")
     print(f"✅ JSON oluşturuldu: {OUTPUT_JSON}")
     print(f"📌 {len_ozet} parti • {len(asama_order)} aşama • {gk:,.0f} kg")
 
