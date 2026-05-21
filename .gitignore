@@ -1,3 +1,6 @@
 *.pyc
 __pycache__/
 extract_html.py
+index.html
+parti_veri.json
+parti_takip.html

@@ -15,8 +15,9 @@ from datetime import datetime
 # ═══════════════════════════════════════════════
 # KONFİGÜRASYON - KENDİ DOSYA YOLUNUZLA DEĞİŞTİRİN
 # ═══════════════════════════════════════════════
-EXCEL_PATH = "veri.xlsx"         # Excel dosyasının adı (repo kökünde)
-OUTPUT_JSON = "parti_veri.json"   # Polling için JSON verisi
+EXCEL_PATH = "veri.xlsx"
+OUTPUT_HTML = "index.html"
+OUTPUT_JSON = "parti_veri.json"
 
 BEKLEME_UYARI_GUN = 7
 BEKLEME_KRITIK_GUN = 14
@@ -307,13 +308,30 @@ def main():
             sys.exit(1)
 
     asama_data, asama_order, bir_sonraki_sirasi, ts, gk = process_excel(excel_path)
+    len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
+
+    data_json = json.dumps(asama_data, ensure_ascii=False).replace("</", "<\\/")
+    order_json = json.dumps(asama_order, ensure_ascii=False).replace("</", "<\\/")
+    bsa_order_json = json.dumps(bir_sonraki_sirasi, ensure_ascii=False).replace("</", "<\\/")
+
+    with open("template.html", "r", encoding="utf-8") as f:
+        html_template = f.read()
+
+    html = html_template.replace("__DATA_JSON__", data_json)
+    html = html.replace("__ORDER_JSON__", order_json)
+    html = html.replace("__BSA_ORDER_JSON__", bsa_order_json)
+    html = html.replace("__TS__", ts)
+    html = html.replace("__LEN_OZET__", str(len_ozet))
+    html = html.replace("__GK__", f"{gk:,.0f}")
+
+    with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
+        f.write(html)
 
     json_content = build_json_file(asama_data, asama_order, bir_sonraki_sirasi)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         f.write(json_content)
 
-    len_ozet = sum(v["parti_sayisi"] for v in asama_data.values())
-    print(f"✅ JSON oluşturuldu: {OUTPUT_JSON}")
+    print(f"✅ {OUTPUT_HTML} + {OUTPUT_JSON} oluşturuldu")
     print(f"📌 {len_ozet} parti • {len(asama_order)} aşama • {gk:,.0f} kg")
 
 if __name__ == "__main__":
